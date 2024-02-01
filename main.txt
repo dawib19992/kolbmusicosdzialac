@@ -1,0 +1,66 @@
+#include "Wybor.h"
+#include "zbior.h"
+#include <random>
+#include <algorithm>
+
+using namespace std;
+
+/*
+* Uwaga: Zadania kod rozwiazania zaania umieszczać pomiędzy #ifdef a #endif. 
+*/
+
+#ifdef Kol_1
+
+class RoznyOdVectora
+{
+	const vector<double>& wartosci;
+	const double tolerancja ;
+
+public:
+	RoznyOdVectora(const vector<double>& w, double tol): wartosci(w),tolerancja(tol) {}
+
+	bool operator()(double x) const {
+		for (double wartosc : wartosci)
+		{
+			if (abs(x - wartosc) < tolerancja) {
+				return false;
+			}
+		}
+		return true;
+	}
+};
+
+
+
+int main()
+{
+	random_device rd;
+	mt19937 gen(rd());
+	uniform_int_distribution<int> liczbaElementowPrzedzial(5, 10);
+	const double dolnaGranica = 0.0;
+	const double gornaGranica = 10.0;
+
+	vector<double> wyniki;
+
+	for (int i = 0; i < 3; i++)
+	{
+		int liczbaElementow = liczbaElementowPrzedzial(gen);
+
+		Zbior zbior(liczbaElementow, dolnaGranica, gornaGranica);
+		double mediana = static_cast<double>(zbior);
+		wyniki.push_back(mediana);
+		cout << "Zbior" << i + 1 << " (rozmiar: " << liczbaElementow << " ), mediana: " << mediana << endl;
+	}
+	RoznyOdVectora funktor(wyniki, 0.003);
+	vector<double> innyWektor = { 0.99,4.56,7.91,2.35,5.66 };
+	innyWektor.erase(remove_if(innyWektor.begin(), innyWektor.end(), funktor), innyWektor.end());
+
+	cout << "Wektor po usunieciu elementow istotnie roznych od wektora przykladowego: \n";
+	for (const auto& elem : innyWektor)
+	{
+		cout << elem << " ";
+	}
+	cout << endl;
+}
+
+#endif
